@@ -5,7 +5,7 @@ export class AppController {
   private stripe;
 
   constructor() {
-    this.stripe = require("stripe")("sk_test_51MlrevGxkAEWJXFvFvAmwavTSDcChcWBylcFnieVbF2BLfZmd9qi1TYCUnFxH11ct14ODPKmfDmIrc9o7Kt0aenk00zjSjJ7Ld");
+    this.stripe = require("stripe")(process.env.STRYPE_KEY);
   }
 
   @Get("connection_token")
