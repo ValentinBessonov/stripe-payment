@@ -1,4 +1,5 @@
 import { Controller, Get, Post } from '@nestjs/common';
+import { Body } from '@nestjs/common/decorators';
 
 @Controller("api")
 export class AppController {
@@ -31,10 +32,10 @@ export class AppController {
   }
 
   @Post("register_reader")
-  async RegisterReader(req) {
+  async RegisterReader(@Body() body) {
     const reader = await this.stripe.terminal.readers.create({
       registration_code: 'simulated-wpe',
-      location: req.body.location_id,
+      location: body.location_id,
     });
 
     return reader;
@@ -45,9 +46,9 @@ export class AppController {
   // 'card_present'.
   // To automatically capture funds when a charge is authorized,
   // set `capture_method` to `automatic`.
-  async CreatePaymentIntent(req) {
+  async CreatePaymentIntent(@Body() body) {
     const intent = await this.stripe.paymentIntents.create({
-      amount: req.body.amount,
+      amount: body.amount,
       currency: 'usd',
       payment_method_types: [
         'card_present',
@@ -59,24 +60,24 @@ export class AppController {
   }
 
   @Post("process_payment")
-  async ProcessPayment(req) {
-    const reader = await this.stripe.terminal.readers.processPaymentIntent(req.body.reader_id, {
-      payment_intent: req.body.payment_intent_id
+  async ProcessPayment(@Body() body) {
+    const reader = await this.stripe.terminal.readers.processPaymentIntent(body.reader_id, {
+      payment_intent: body.payment_intent_id
     });
 
     return reader;
   }
 
   @Post("simulate_payment")
-  async SimulatePayment(req) {
-    const reader = await this.stripe.testHelpers.terminal.readers.presentPaymentMethod(req.body.reader_id);
+  async SimulatePayment(@Body() body) {
+    const reader = await this.stripe.testHelpers.terminal.readers.presentPaymentMethod(body.reader_id);
 
     return reader;
   }
 
   @Post("capture_payment_intent")
-  async CapturePaymentIntent(req) {
-    const intent = await this.stripe.paymentIntents.capture(req.body.payment_intent_id);
+  async CapturePaymentIntent(@Body() body) {
+    const intent = await this.stripe.paymentIntents.capture(body.payment_intent_id);
     return intent;
   }
 }
