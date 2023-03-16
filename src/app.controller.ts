@@ -53,7 +53,7 @@ export class AppController {
       payment_method_types: [
         'card_present',
       ],
-      capture_method: 'manual',
+      capture_method: 'requires_capture',
     });
 
     return intent;
