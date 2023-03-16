@@ -1,5 +1,5 @@
 import { Controller, Get, Post } from '@nestjs/common';
-import { Body } from '@nestjs/common/decorators';
+import { Body, HttpCode } from '@nestjs/common/decorators';
 
 @Controller("api")
 export class AppController {
@@ -19,6 +19,7 @@ export class AppController {
     }
   }
 
+  @HttpCode(200)
   @Post("create_location")
   async CreateLocation() {
     const location = await this.stripe.terminal.locations.create({
@@ -37,6 +38,7 @@ export class AppController {
     return location;
   }
 
+  @HttpCode(200)
   @Post("register_reader")
   async RegisterReader(@Body() body) {
     const reader = await this.stripe.terminal.readers.create({
@@ -47,6 +49,7 @@ export class AppController {
     return { result: reader };
   }
 
+  @HttpCode(200)
   @Post("create_payment_intent")
   // For Terminal payments, the 'payment_method_types' parameter must include
   // 'card_present'.
@@ -65,6 +68,7 @@ export class AppController {
     return { result: intent };
   }
 
+  @HttpCode(200)
   @Post("process_payment")
   async ProcessPayment(@Body() body) {
     const reader = await this.stripe.terminal.readers.processPaymentIntent(body.reader_id, {
@@ -74,6 +78,7 @@ export class AppController {
     return { result: reader };
   }
 
+  @HttpCode(200)
   @Post("simulate_payment")
   async SimulatePayment(@Body() body) {
     const reader = await this.stripe.testHelpers.terminal.readers.presentPaymentMethod(body.reader_id);
@@ -81,9 +86,16 @@ export class AppController {
     return { result: reader };
   }
 
+  @HttpCode(200)
   @Post("capture_payment_intent")
   async CapturePaymentIntent(@Body() body) {
     const intent = await this.stripe.paymentIntents.capture(body.payment_intent_id);
     return { result: intent };
+  }
+
+  @Get("payments")
+  async GetPayments() {
+    const paymentIntents = await this.stripe.paymentIntents.list();
+    return { result: paymentIntents.data };
   }
 }
