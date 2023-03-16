@@ -39,54 +39,6 @@ export class AppController {
   }
 
   @HttpCode(200)
-  @Post("register_reader")
-  async RegisterReader(@Body() body) {
-    const reader = await this.stripe.terminal.readers.create({
-      registration_code: 'simulated-wpe',
-      location: body.location_id,
-    });
-
-    return { result: reader };
-  }
-
-  @HttpCode(200)
-  @Post("create_payment_intent")
-  // For Terminal payments, the 'payment_method_types' parameter must include
-  // 'card_present'.
-  // To automatically capture funds when a charge is authorized,
-  // set `capture_method` to `automatic`.
-  async CreatePaymentIntent(@Body() body) {
-    const intent = await this.stripe.paymentIntents.create({
-      amount: body.amount,
-      currency: 'usd',
-      payment_method_types: [
-        'card_present',
-      ],
-      capture_method: 'manual',
-    });
-
-    return { result: intent };
-  }
-
-  @HttpCode(200)
-  @Post("process_payment")
-  async ProcessPayment(@Body() body) {
-    const reader = await this.stripe.terminal.readers.processPaymentIntent(body.reader_id, {
-      payment_intent: body.payment_intent_id
-    });
-
-    return { result: reader };
-  }
-
-  @HttpCode(200)
-  @Post("simulate_payment")
-  async SimulatePayment(@Body() body) {
-    const reader = await this.stripe.testHelpers.terminal.readers.presentPaymentMethod(body.reader_id);
-
-    return { result: reader };
-  }
-
-  @HttpCode(200)
   @Post("capture_payment_intent")
   async CapturePaymentIntent(@Body() body) {
     const intent = await this.stripe.paymentIntents.capture(body.payment_intent_id);
