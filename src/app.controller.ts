@@ -96,6 +96,19 @@ export class AppController {
   @Get("payments")
   async GetPayments() {
     const paymentIntents = await this.stripe.paymentIntents.list();
-    return { result: paymentIntents.data };
+    // return paymentIntents;
+    return {
+      result: paymentIntents.data
+        .filter(x => x.status == 'succeeded')
+        .map(x => {
+          return {
+            id: x.id,
+            amount: x.amount / 100,
+            created: new Date(x.created).toISOString(), // convert to c# format
+            currency: x.currency,
+            description: x.description
+          }
+        })
+    };
   }
 }
