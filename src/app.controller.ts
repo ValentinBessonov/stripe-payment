@@ -12,19 +12,23 @@ export class AppController {
   @Get("connection_token")
   async ConnectionToken() {
     const connectionToken = await this.stripe.terminal.connectionTokens.create();
-    return { secret: connectionToken.secret }
+    return {
+      result: { secret: connectionToken.secret }
+    }
   }
 
   @Post("create_location")
   async CreateLocation() {
     const location = await this.stripe.terminal.locations.create({
-      display_name: 'HQ',
-      address: {
-        line1: '1272 Valencia Street',
-        city: 'San Francisco',
-        state: 'CA',
-        country: 'US',
-        postal_code: '94110',
+      result: {
+        display_name: 'HQ',
+        address: {
+          line1: '1272 Valencia Street',
+          city: 'San Francisco',
+          state: 'CA',
+          country: 'US',
+          postal_code: '94110',
+        }
       }
     });
 
@@ -38,7 +42,7 @@ export class AppController {
       location: body.location_id,
     });
 
-    return reader;
+    return { result: reader };
   }
 
   @Post("create_payment_intent")
@@ -53,10 +57,10 @@ export class AppController {
       payment_method_types: [
         'card_present',
       ],
-      capture_method: 'requires_capture',
+      capture_method: 'manual',
     });
 
-    return intent;
+    return { result: intent };
   }
 
   @Post("process_payment")
@@ -65,19 +69,19 @@ export class AppController {
       payment_intent: body.payment_intent_id
     });
 
-    return reader;
+    return { result: reader };
   }
 
   @Post("simulate_payment")
   async SimulatePayment(@Body() body) {
     const reader = await this.stripe.testHelpers.terminal.readers.presentPaymentMethod(body.reader_id);
 
-    return reader;
+    return { result: reader };
   }
 
   @Post("capture_payment_intent")
   async CapturePaymentIntent(@Body() body) {
     const intent = await this.stripe.paymentIntents.capture(body.payment_intent_id);
-    return intent;
+    return { result: intent };
   }
 }
