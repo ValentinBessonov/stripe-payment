@@ -13,7 +13,7 @@ export class AppController {
   async ConnectionToken() {
     const connectionToken = await this.stripe.terminal.connectionTokens.create();
     return {
-      result: { secret: connectionToken.secret }
+      secret: connectionToken.secret
     }
   }
 
